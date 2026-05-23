@@ -31,10 +31,24 @@
             width: 100%;
         }
 
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .header-image {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
         h1 {
             text-align: center;
             color: #333;
-            margin-bottom: 10px;
             font-size: 2.5em;
         }
 
@@ -64,11 +78,29 @@
             align-items: center;
             justify-content: center;
             overflow: hidden;
+            position: relative;
         }
 
         .card:hover:not(.matched) {
             transform: scale(1.05);
             box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card-back img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: cover;
+            width: 100%;
+            height: 100%;
         }
 
         .card img {
@@ -82,6 +114,10 @@
         .card.flipped {
             background: white;
             border: 2px solid #667eea;
+        }
+
+        .card.flipped .card-back {
+            display: none;
         }
 
         .card.matched {
@@ -130,6 +166,15 @@
                 padding: 20px;
             }
 
+            .header {
+                gap: 10px;
+            }
+
+            .header-image {
+                width: 50px;
+                height: 50px;
+            }
+
             h1 {
                 font-size: 1.8em;
             }
@@ -147,7 +192,11 @@
 </head>
 <body>
     <div class="container">
-        <h1>🍽️ Food Match Game</h1>
+        <div class="header">
+            <img src="images/IMG_5596.jpeg" alt="Food Icon" class="header-image" onerror="this.style.display='none'">
+            <h1>🍽️ Food Match</h1>
+            <img src="images/IMG_5596.jpeg" alt="Food Icon" class="header-image" onerror="this.style.display='none'">
+        </div>
         <div class="score">Matches: <span id="matches">0</span>/8</div>
         <div class="game-board" id="gameBoard"></div>
         <div class="controls">
@@ -209,6 +258,8 @@
                 } else if (flippedCards[index]) {
                     cardElement.classList.add('flipped');
                     cardElement.innerHTML = `<img src="${card.img}" alt="${card.name}" onerror="this.style.display='none'">`;
+                } else {
+                    cardElement.innerHTML = `<div class="card-back"><img src="images/IMG_6716.jpeg" alt="Card Back" onerror="this.style.display='none'"></div>`;
                 }
 
                 cardElement.addEventListener('click', () => flipCard(index, cardElement));
