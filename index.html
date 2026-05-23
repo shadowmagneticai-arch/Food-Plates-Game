@@ -1,1 +1,266 @@
-<!DOCTYPE html> <html lang="en"> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0"> <meta name="apple-mobile-web-app-capable" content="yes"> <title>Food Matching Game</title> <style> body { font-family: Arial, sans-serif; background-color: #f5f5f5; display: flex; flex-direction: column; align-items: center; padding: 20px; } h2 { margin-bottom: 5px; } #score { margin-top: 5px; color: #27ae60; } .controls { margin: 15px 0; } .btn { background-color: #27ae60; color: white; border: none; padding: 10px 20px; font-size: 16px; border-radius: 5px; cursor: pointer; font-weight: bold; } .btn:hover { background-color: #219653; } /* RESPONSIVE GRID */ #game { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; width: 100%; max-width: 500px; } .card { width: 100%; aspect-ratio: 1 / 1; perspective: 1000px; } .inner { position: relative; width: 100%; height: 100%; transition: transform 0.5s; transform-style: preserve-3d; border-radius: 8px; } .card.flipped .inner { transform: rotateY(180deg); } .front, .back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 8px; overflow: hidden; } .back { background: #2c3e50; display: flex; align-items: center; justify-content: center; color: white; } .front { transform: rotateY(180deg); } img { width: 100%; height: 100%; object-fit: cover; } .card.matched .inner { opacity: 0.6; box-shadow: 0 0 15px #27ae60; } /* Plate */ #plate { margin-top: 20px; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; } .plate-item img { width: 50px; height: 50px; border-radius: 50%; } /* Win screen */ #win-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; } .win-box { background: white; padding: 30px; border-radius: 10px; text-align: center; } </style> </head> <body> <h2>Food Matching Game</h2> <h3 id="score">Score: 0</h3> <div class="controls"> <button class="btn" onclick="initGame()">Restart</button> </div> <div id="game"></div> <h3>Your Plate</h3> <div id="plate"></div> <div id="win-overlay"> <div class="win-box"> <h1>🎉 You Win! 🎉</h1> <button class="btn" onclick="initGame()">Play Again</button> </div> </div> <script> const foods = [ {name:"Fried Chicken", img:"images/fried_chicken.jpg"}, {name:"Curry Chicken", img:"images/curry_chicken.jpg"}, {name:"BBQ Chicken", img:"images/bbq_chicken.jpg"}, {name:"Chicken Nuggets", img:"images/chicken_nuggets.jpg"}, {name:"Mac & Cheese", img:"images/mac_cheese.jpg"}, {name:"Cornbread", img:"images/cornbread.jpg"}, {name:"Collard Greens", img:"images/collard_greens.jpg"}, {name:"Banana Pudding", img:"images/banana_pudding.jpg"} ]; const game = document.getElementById("game"); const plate = document.getElementById("plate"); const scoreDisplay = document.getElementById("score"); const winOverlay = document.getElementById("win-overlay"); let first = null; let second = null; let lock = false; let matchCount = 0; let score = 0; function initGame() { game.innerHTML = ""; plate.innerHTML = ""; winOverlay.style.display = "none"; first = null; second = null; lock = false; matchCount = 0; score = 0; scoreDisplay.innerText = "Score: 0"; let cards = [...foods, ...foods].sort(() => Math.random() - 0.5); cards.forEach(item => { const card = document.createElement("div"); card.className = "card"; card.innerHTML = <div class="inner"> <div class="front"> <img src="${item.img}"> </div> <div class="back">?</div> </div> ; card.addEventListener("click", () => { if (lock || card.classList.contains("flipped") || card.classList.contains("matched")) return; card.classList.add("flipped"); if (!first) { first = {card, item}; return; } second = {card, item}; lock = true; if (first.item.name === second.item.name) { first.card.classList.add("matched"); second.card.classList.add("matched"); // Plate add const plateItem = document.createElement("div"); plateItem.className = "plate-item"; plateItem.innerHTML = <img src="${item.img}">; plate.appendChild(plateItem); score += 10; scoreDisplay.innerText = "Score: " + score; matchCount++; if (matchCount === foods.length) { setTimeout(() => { winOverlay.style.display = "flex"; }, 400); } reset(); } else { score -= 2; scoreDisplay.innerText = "Score: " + score; setTimeout(() => { first.card.classList.remove("flipped"); second.card.classList.remove("flipped"); reset(); }, 700); } }); game.appendChild(card); }); } function reset() { first = null; second = null; lock = false; } initGame(); </script> </body> </html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Food Matching Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .score {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            aspect-ratio: 1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 3em;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .card:hover:not(.matched) {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .card img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: cover;
+            width: 100%;
+            height: 100%;
+        }
+
+        .card.flipped {
+            background: white;
+            border: 2px solid #667eea;
+        }
+
+        .card.matched {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 24px;
+            font-size: 1em;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .btn-reset {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-reset:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .message {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: #764ba2;
+            font-weight: bold;
+            min-height: 30px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .game-board {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+            }
+
+            .card {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🍽️ Food Match Game</h1>
+        <div class="score">Matches: <span id="matches">0</span>/8</div>
+        <div class="game-board" id="gameBoard"></div>
+        <div class="controls">
+            <button class="btn-reset" onclick="resetGame()">New Game</button>
+        </div>
+        <div class="message" id="message"></div>
+    </div>
+
+    <script>
+        const foods = [
+            { name: 'fried_chicken', img: 'images/fried_chicken.jpeg' },
+            { name: 'curry_chicken', img: 'images/curry_chicken.jpeg' },
+            { name: 'bbq_chicken', img: 'images/bbq_chicken.jpeg' },
+            { name: 'chicken_nuggets', img: 'images/chicken_nuggets.jpeg' },
+            { name: 'mac_cheese', img: 'images/mac_cheese.jpeg' },
+            { name: 'cornbread', img: 'images/cornbread.jpeg' },
+            { name: 'collard_greens', img: 'images/collard_greens.jpeg' },
+            { name: 'banana_pudding', img: 'images/banana_pudding.jpeg' }
+        ];
+
+        let gameCards = [...foods, ...foods];
+        let flippedCards = [];
+        let matchedPairs = 0;
+        let isChecking = false;
+
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
+        function initGame() {
+            gameCards = shuffleArray([...foods, ...foods]);
+            flippedCards = [];
+            matchedPairs = 0;
+            isChecking = false;
+            document.getElementById('matches').textContent = '0';
+            document.getElementById('message').textContent = '';
+            renderBoard();
+        }
+
+        function renderBoard() {
+            const gameBoard = document.getElementById('gameBoard');
+            gameBoard.innerHTML = '';
+
+            gameCards.forEach((card, index) => {
+                const cardElement = document.createElement('button');
+                cardElement.className = 'card';
+                cardElement.dataset.index = index;
+                cardElement.dataset.name = card.name;
+
+                if (cardElement.dataset.name === flippedCards[index]) {
+                    cardElement.classList.add('flipped', 'matched');
+                    cardElement.innerHTML = `<img src="${card.img}" alt="${card.name}" onerror="this.style.display='none'">`;
+                    cardElement.disabled = true;
+                } else if (flippedCards[index]) {
+                    cardElement.classList.add('flipped');
+                    cardElement.innerHTML = `<img src="${card.img}" alt="${card.name}" onerror="this.style.display='none'">`;
+                }
+
+                cardElement.addEventListener('click', () => flipCard(index, cardElement));
+                gameBoard.appendChild(cardElement);
+            });
+        }
+
+        function flipCard(index, cardElement) {
+            if (isChecking || flippedCards[index] || cardElement.classList.contains('matched')) {
+                return;
+            }
+
+            flippedCards[index] = gameCards[index].name;
+            cardElement.classList.add('flipped');
+            cardElement.innerHTML = `<img src="${gameCards[index].img}" alt="${gameCards[index].name}" onerror="this.style.display='none'">`;
+
+            if (flippedCards.filter(Boolean).length === 2) {
+                isChecking = true;
+                setTimeout(checkMatch, 800);
+            }
+        }
+
+        function checkMatch() {
+            const flipped = flippedCards.map((card, i) => card ? i : null).filter(i => i !== null);
+
+            if (flipped.length === 2) {
+                const [index1, index2] = flipped;
+
+                if (gameCards[index1].name === gameCards[index2].name) {
+                    matchedPairs++;
+                    document.getElementById('matches').textContent = matchedPairs;
+                    renderBoard();
+
+                    if (matchedPairs === foods.length) {
+                        document.getElementById('message').textContent = '🎉 You Won! Congratulations!';
+                    }
+                } else {
+                    flippedCards[index1] = null;
+                    flippedCards[index2] = null;
+                    renderBoard();
+                }
+            }
+
+            isChecking = false;
+        }
+
+        function resetGame() {
+            initGame();
+        }
+
+        // Initialize the game when page loads
+        initGame();
+    </script>
+</body>
+</html>
