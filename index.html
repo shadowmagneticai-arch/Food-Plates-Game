@@ -218,6 +218,7 @@
         ];
 
         let gameCards = [...foods, ...foods];
+        let matchedIndices = new Set();
         let flippedCards = [];
         let matchedPairs = 0;
         let isChecking = false;
@@ -234,6 +235,7 @@
         function initGame() {
             gameCards = shuffleArray([...foods, ...foods]);
             flippedCards = [];
+            matchedIndices = new Set();
             matchedPairs = 0;
             isChecking = false;
             document.getElementById('matches').textContent = '0';
@@ -251,11 +253,11 @@
                 cardElement.dataset.index = index;
                 cardElement.dataset.name = card.name;
 
-                if (cardElement.dataset.name === flippedCards[index]) {
+                if (matchedIndices.has(index)) {
                     cardElement.classList.add('flipped', 'matched');
                     cardElement.innerHTML = `<img src="${card.img}" alt="${card.name}" onerror="this.style.display='none'">`;
                     cardElement.disabled = true;
-                } else if (flippedCards[index]) {
+                } else if (flippedCards.includes(index)) {
                     cardElement.classList.add('flipped');
                     cardElement.innerHTML = `<img src="${card.img}" alt="${card.name}" onerror="this.style.display='none'">`;
                 } else {
@@ -268,39 +270,37 @@
         }
 
         function flipCard(index, cardElement) {
-            if (isChecking || flippedCards[index] || cardElement.classList.contains('matched')) {
+            if (isChecking || flippedCards.includes(index) || matchedIndices.has(index)) {
                 return;
             }
 
-            flippedCards[index] = gameCards[index].name;
+            flippedCards.push(index);
             cardElement.classList.add('flipped');
             cardElement.innerHTML = `<img src="${gameCards[index].img}" alt="${gameCards[index].name}" onerror="this.style.display='none'">`;
 
-            if (flippedCards.filter(Boolean).length === 2) {
+            if (flippedCards.length === 2) {
                 isChecking = true;
                 setTimeout(checkMatch, 800);
             }
         }
 
         function checkMatch() {
-            const flipped = flippedCards.map((card, i) => card ? i : null).filter(i => i !== null);
+            const [index1, index2] = flippedCards;
 
-            if (flipped.length === 2) {
-                const [index1, index2] = flipped;
+            if (gameCards[index1].name === gameCards[index2].name) {
+                matchedIndices.add(index1);
+                matchedIndices.add(index2);
+                matchedPairs++;
+                document.getElementById('matches').textContent = matchedPairs;
+                flippedCards = [];
+                renderBoard();
 
-                if (gameCards[index1].name === gameCards[index2].name) {
-                    matchedPairs++;
-                    document.getElementById('matches').textContent = matchedPairs;
-                    renderBoard();
-
-                    if (matchedPairs === foods.length) {
-                        document.getElementById('message').textContent = '🎉 You Won! Congratulations!';
-                    }
-                } else {
-                    flippedCards[index1] = null;
-                    flippedCards[index2] = null;
-                    renderBoard();
+                if (matchedPairs === foods.length) {
+                    document.getElementById('message').textContent = '🎉 You Won! Congratulations!';
                 }
+            } else {
+                flippedCards = [];
+                renderBoard();
             }
 
             isChecking = false;
